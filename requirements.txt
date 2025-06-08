@@ -1,0 +1,9 @@
+Flask              # For running the web server
+flask-cors         # For handling CORS in API calls
+numpy              # Used throughout for data arrays
+pandas             # Used to handle stock data
+requests           # For calling Twelve Data API
+scikit-learn       # For MinMaxScaler (used in preprocessing)
+tensorflow         # For running the trained model (.h5)
+keras              # Used in model loading (via load_model)
+joblib             # For loading the scaler (.pkl)

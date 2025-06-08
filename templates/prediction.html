@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Stock Market Prediction</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='prediction-styles.css') }}"> 
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('stock_prices') }}">Stock Prices</a></li>
+                <li><a href="{{ url_for('prediction_page') }}">Prediction</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="prediction-page">
+        <section class="form-section">
+            <h1>Stock Market Prediction</h1>
+            <form id="prediction-form">
+                <label for="stock-name">Stock Name:</label>
+                <input type="text" id="stock-name" placeholder="Enter stock name" />
+
+                <label for="days">Prediction Days:</label>
+                <input type="number" id="days" placeholder="Enter number of days" />
+
+                <button type="button" id="predict-btn">Predict</button>
+            </form>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart" id="predicted-stock-chart">
+                <h2>Future Stock Prediction</h2>
+                <canvas id="futureChart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

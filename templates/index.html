@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Market Prediction</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='index-styles.css') }}">
+</head>
+<body>
+  <main class="homepage">
+    <video autoplay muted loop playsinline id="bg-video">
+      <source src="{{ url_for('static', filename='video/background_video.mp4') }}" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="overlay">
+      <section id="intro">
+        <h1>Welcome to Stock Market Prediction</h1>
+        <p>Accurate stock market forecasts and real-time stock prices!</p>
+        <div class="btn-group">
+          <a href="{{ url_for('stock_prices') }}" class="btn">Live Prices</a>
+          <a href="{{ url_for('prediction_page') }}" class="btn">Start Predicting</a>
+        </div>
+      </section>
+    </div>
+  </main>   
+</body>
+</html>

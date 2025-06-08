@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Market Prediction</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='stockprices-styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .reference-links {
+      margin: 10px 0;
+    }
+
+    .reference-links a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #0066cc;
+      font-weight: bold;
+    }
+
+    .reference-links a:hover {
+      text-decoration: underline;
+    }
+
+    #stock-info {
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    #stockChart {
+      max-width: 100%;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+ <header>
+  <nav>
+    <ul>
+      <li><a href="{{ url_for('index') }}">Home</a></li>
+      <li><a href="{{ url_for('stock_prices') }}">Stock Prices</a></li>
+      <li> <a href="{{ url_for('prediction_page') }}">Prediction</a></li>
+    </ul>
+  </nav>
+</header>
+
+  <main class="stock-prices">
+    <h1>Live US Tech Stock Prices</h1>
+
+    <div class="reference-links" style="margin: 20px 0;">
+      <p style="font-weight: bold; margin-bottom: 10px;">For More References Visit:</p>
+      <a href="https://www.nseindia.com/" target="_blank" class="ref-button">NSE India</a>
+      <a href="https://finance.yahoo.com/" target="_blank" class="ref-button">Yahoo Finance</a>
+    </div>
+    <label for="stock-select">Select a stock symbol:</label>
+    <select id="stock-select">
+      <option value="AAPL">Apple (AAPL)</option>
+      <option value="GOOG">Google (GOOG)</option>
+      <option value="AMZN">Amazon (AMZN)</option>
+      <option value="TSLA">Tesla (TSLA)</option>
+      <option value="MSFT">Microsoft (MSFT)</option>
+      <option value="NVDA">NVIDIA (NVDA)</option>
+      <option value="META">Meta (META)</option>
+      <option value="NFLX">Netflix (NFLX)</option>
+      <option value="INTC">Intel (INTC)</option>
+      <option value="NKE">Nike (NKE)</option>
+      <option value="SPOT">Spotify (SPOT)</option>
+      <option value="CRM">Salesforce (CRM)</option>
+    </select>
+
+    <button onclick="updateStock()">Get Stock Price</button>
+
+    <div id="stock-info">
+      <p id="stock-name"></p>
+      <p id="stock-price"></p>
+      <p id="stock-change"></p>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <canvas id="stockChart"></canvas>
+    </div>
+  </main>
+
+  <script>
+    const apiKey = "e5c3c65926014d0788706389a9a306c3";
+    let chart;
+
+    async function fetchQuote(symbol) {
+      const url = `https://api.twelvedata.com/price?symbol=${symbol}&apikey=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === "error") {
+        console.error("Error fetching quote:", data.message);
+        return null;
+      }
+      return data;
+    }
+
+    async function fetchHistory(symbol) {
+      const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1h&outputsize=24&apikey=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === "error" || !data.values) {
+        console.error("Error fetching history:", data.message || "No values");
+        return null;
+      }
+      return data.values.reverse(); // oldest to newest
+    }
+
+    function convertToIST(utcTimeString) {
+      const utcDate = new Date(utcTimeString + ' UTC');
+      const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
+      return istDate.toTimeString().split(' ')[0].slice(0, 5); // HH:MM
+    }
+
+    async function updateStock() {
+      const symbol = document.getElementById("stock-select").value;
+      const quote = await fetchQuote(symbol);
+      const history = await fetchHistory(symbol);
+
+      if (!quote || !quote.price || !history) {
+        document.getElementById("stock-name").textContent = "Stock data not available.";
+        document.getElementById("stock-price").textContent = "";
+        document.getElementById("stock-change").textContent = "";
+        if (chart) chart.destroy();
+        return;
+      }
+
+      document.getElementById("stock-name").textContent = `Stock: ${symbol}`;
+      document.getElementById("stock-price").textContent = `Price: $${parseFloat(quote.price).toFixed(2)}`;
+
+      const previousClose = history[history.length - 2]?.close;
+      const currentPrice = parseFloat(quote.price);
+      const change = previousClose ? currentPrice - parseFloat(previousClose) : 0;
+      const percentChange = previousClose ? (change / parseFloat(previousClose)) * 100 : 0;
+
+      document.getElementById("stock-change").textContent = `Change: $${change.toFixed(2)} (${percentChange.toFixed(2)}%)`;
+
+      const labels = history.map(item => convertToIST(item.datetime));
+      const prices = history.map(item => parseFloat(item.close));
+
+      if (chart) chart.destroy();
+
+      const ctx = document.getElementById("stockChart").getContext("2d");
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `${symbol} Price (Last 24h - IST)`,
+            data: prices,
+            fill: false,
+            borderColor: "blue",
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Time (IST)'
+              }
+            },
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Price (USD)'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Load default stock on page load
+    updateStock();
+  </script>
+</body>
+</html>

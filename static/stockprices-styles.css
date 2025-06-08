@@ -1,0 +1,91 @@
+/* Header and Navigation */
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Stock Prices Page */
+main.stock-prices {
+    padding: 20px;
+    text-align: center;
+}
+
+main.stock-prices .reference-links a {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+main.stock-prices .reference-links a:hover {
+    background-color: #0056b3;
+}
+
+main.stock-prices .reference-links button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+main.stock-prices .reference-links button:hover {
+    background-color: #004d99;
+}
+
+main.stock-prices .links a.btn-link {
+    display: inline-block;
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+main.stock-prices .links a.btn-link:hover {
+    background: #555;
+}
+
+main.stock-prices table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 80%;
+}
+
+main.stock-prices table, th, td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+main.stock-prices h2 {
+    margin-top: 30px;
+}
