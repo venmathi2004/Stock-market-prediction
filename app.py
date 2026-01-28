@@ -1,36 +1,39 @@
 # app.py
+import os  # ✅ VERY IMPORTANT (ERROR FIX)
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import numpy as np
-import tensorflow as tf
-import json
-# from tensorflow.keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
-from predict_utils import fetch_latest_data, preprocess_input, predict_multi_day
 
+from predict_utils import (
+    fetch_latest_data,
+    preprocess_input,
+    predict_multi_day
+)
+
+# ---------------- APP INIT ----------------
 app = Flask(__name__)
 CORS(app)
 
-# ✅ Home page with named endpoint
-@app.route("/", endpoint="index")
-def home():
+# ---------------- ROUTES ----------------
+
+@app.route("/")
+def index():
     return render_template("index.html")
 
-# Stock Prices page
 @app.route("/stock-prices")
 def stock_prices():
     return render_template("stock-prices.html")
 
-# Prediction page
-@app.route("/prediction", endpoint="prediction_page")
+@app.route("/prediction")
 def prediction_page():
-    return render_template ("prediction.html")
-# Prediction API
-@app.route("/predict", methods=['POST'])
+    return render_template("prediction.html")
+
+# ---------------- API ----------------
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
-        data = request.get_json()
-        stock = data.get("stock", "AAPL, GOOG, AMZN, TSLA, MSFT")
+        data = request.get_json(force=True)
+
+        stock = data.get("stock", "AAPL")
         days = int(data.get("days", 5))
 
         df = fetch_latest_data(stock)
@@ -46,6 +49,7 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# ---------------- MAIN ----------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True)
